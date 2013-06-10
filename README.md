@@ -34,11 +34,11 @@ With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 r
 
 For example, a request to:
 
-```https://myapp.herokuapp.com/foo?bar=baz```
+    https://myapp.herokuapp.com/foo?bar=bar
 
 will be 301 redirected to:
 
-```https://www.myapp.com/foo?bar=baz```
+    https://www.myapp.com/foo?bar=baz
 
 
 Rack Configuration
