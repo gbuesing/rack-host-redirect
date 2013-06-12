@@ -25,6 +25,15 @@ class TestHostRedirect < Test::Unit::TestCase
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'www.baz.com'
     assert last_response.ok?
   end
+
+  def test_prefers_x_forwarded_host_when_available
+    env = {'HTTP_HOST' => 'localhost', 'SERVER_NAME' => 'localhost', 'SERVER_PORT' => '3000'}
+    get '/one', {'two' => 'three'}, env
+    assert last_response.ok?
+    get '/one', {'two' => 'three'}, env.merge('HTTP_X_FORWARDED_HOST' => 'www.foo.com')
+    assert_equal 301, last_response.status
+    assert_equal 'http://www.bar.com/one?two=three', last_response['location']
+  end
 end
 
 

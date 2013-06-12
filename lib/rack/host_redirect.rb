@@ -10,11 +10,13 @@ class Rack::HostRedirect
   end
 
   def call(env)
-    host = (env['HTTP_HOST'] || env['SERVER_NAME']).downcase
+    request = Rack::Request.new(env)
+    host = request.host.downcase # downcase for case-insensitive matching
+
     updated_host = (@host_mapping && @host_mapping[host]) || (@block && @block.call(host, env))
 
     if updated_host
-      redirect_to(updated_host, env)
+      redirect_to(updated_host, request)
     else
       @app.call(env)
     end
@@ -26,8 +28,7 @@ class Rack::HostRedirect
       hsh.inject({}) {|out, (k, v)| out[k.downcase] = v; out }
     end
 
-    def redirect_to updated_host, env
-      request = Rack::Request.new(env)
+    def redirect_to updated_host, request
       location = URI.parse(request.url)
       location.host = updated_host
       [301, {'Location' => location.to_s}, []]
