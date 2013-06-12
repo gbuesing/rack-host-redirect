@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'rack-host-redirect'
-  s.version = '1.0.0'
+  s.version = '1.1.0'
   s.date    = '2013-06-10'
   s.author  = 'Geoff Buesing'
   s.email   = 'gbuesing@gmail.com'
