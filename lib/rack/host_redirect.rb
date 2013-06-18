@@ -16,7 +16,8 @@ class Rack::HostRedirect
     updated_host = (@host_mapping && @host_mapping[host]) || (@block && @block.call(host, env))
 
     if updated_host
-      redirect_to(updated_host, request)
+      location = replace_host(request.url, updated_host)
+      [301, {'Location' => location}, []]
     else
       @app.call(env)
     end
@@ -28,9 +29,9 @@ class Rack::HostRedirect
       hsh.inject({}) {|out, (k, v)| out[k.downcase] = v; out }
     end
 
-    def redirect_to updated_host, request
-      location = URI.parse(request.url)
-      location.host = updated_host
-      [301, {'Location' => location.to_s}, []]
+    def replace_host url, host
+      url = URI.parse(url)
+      url.host = host
+      url.to_s
     end
 end
