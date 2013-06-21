@@ -34,7 +34,7 @@ With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 r
 
 Path and querystring are preserved, so a request to:
 
-    https://myapp.herokuapp.com/foo?bar=bar
+    https://myapp.herokuapp.com/foo?bar=baz
 
 will be 301 redirected to:
 
