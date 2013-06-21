@@ -64,14 +64,14 @@ run MyApp
 Matching via block
 ------------------
 
-You can optionally specify a block, if you have matching criteria not satisfied by a simple hash lookup:
+You can optionally specify a block, if you have matching criteria not satisfied by a simple hash lookup. Example:
 
 ```ruby
 use Rack::MobileDetect
 
 # Redirects to mobile subdomain when a mobile device is detected
 use Rack::HostRedirect do |host, env|
-  'm.myapp.com' if env['X_MOBILE_DEVICE']
+  'm.myapp.com' if env['X_MOBILE_DEVICE'] && host != 'm.myapp.com'
 end
 ```
 
