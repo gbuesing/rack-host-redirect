@@ -12,7 +12,8 @@ class TestHostRedirect < Test::Unit::TestCase
 
   def app
     Rack::HostRedirect.new(INNER_APP, {
-      'www.FOO.com' => 'www.bar.com'
+      'www.FOO.com' => 'www.bar.com',
+      'LOOP.foo.com' => 'Loop.foo.com'
     })
   end
 
@@ -33,6 +34,11 @@ class TestHostRedirect < Test::Unit::TestCase
     get '/one', {'two' => 'three'}, env.merge('HTTP_X_FORWARDED_HOST' => 'www.foo.com')
     assert_equal 301, last_response.status
     assert_equal 'http://www.bar.com/one?two=three', last_response['location']
+  end
+
+  def test_does_not_redirect_to_current_host
+    get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'loop.foo.COM'
+    assert last_response.ok?
   end
 end
 

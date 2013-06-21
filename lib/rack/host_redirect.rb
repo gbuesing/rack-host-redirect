@@ -15,7 +15,7 @@ class Rack::HostRedirect
 
     updated_host = (@host_mapping && @host_mapping[host]) || (@block && @block.call(host, env))
 
-    if updated_host
+    if updated_host && updated_host.downcase != host
       location = replace_host(request.url, updated_host)
       [301, {'Location' => location}, []]
     else
