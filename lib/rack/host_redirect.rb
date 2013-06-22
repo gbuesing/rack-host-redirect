@@ -1,5 +1,4 @@
-require 'rack'
-require 'uri'
+require 'rack/request'
 
 class Rack::HostRedirect
 
@@ -29,9 +28,16 @@ class Rack::HostRedirect
       hsh.inject({}) {|out, (k, v)| out[k.downcase] = v; out }
     end
 
+    # Captures everything in url except the host:
+    #
+    #     REPLACE_HOST_REGEX =~ 'https://foo.com/bar?baz=qux'
+    #
+    #     $1 == 'https://'
+    #     $2 == '/bar?baz=qux'
+    REPLACE_HOST_REGEX = /(https?:\/\/)[^\/\?:]+(.*)/
+
     def replace_host url, host
-      url = URI.parse(url)
-      url.host = host
-      url.to_s
+      REPLACE_HOST_REGEX =~ url
+      "#{$1}#{host}#{$2}"
     end
 end
