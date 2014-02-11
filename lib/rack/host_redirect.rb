@@ -30,6 +30,8 @@ class Rack::HostRedirect
         
         if newhost = opts[:host]
           opts[:host] = newhost.downcase
+        else
+          raise ArgumentError, ":host key must be specified in #{opts.inspect}"
         end
 
         [k].flatten.each do |oldhost|

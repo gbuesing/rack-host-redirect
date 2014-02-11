@@ -52,4 +52,13 @@ class TestHostRedirect < Test::Unit::TestCase
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'loop.foo.COM'
     assert last_response.ok?
   end
+
+  def test_config_without_host_value_raises_argument_error
+    assert_raises ArgumentError do
+      Rack::HostRedirect.new(INNER_APP, {
+        'BADCONFIG' => {:path => '/'}
+      })
+    end
+  end
 end
+
