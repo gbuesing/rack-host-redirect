@@ -4,7 +4,7 @@ class Rack::HostRedirect
 
   def initialize(app, host_mapping)
     @app = app
-    @host_mapping = downcase_keys(host_mapping)
+    @host_mapping = preprocess_mapping(host_mapping)
   end
 
   def call(env)
@@ -23,8 +23,13 @@ class Rack::HostRedirect
 
   private
 
-    def downcase_keys hsh
-      hsh.inject({}) {|out, (k, v)| out[k.downcase] = v.downcase; out }
+    def preprocess_mapping hsh
+      hsh.inject({}) do |out, (k, v)| 
+        [k].flatten.each do |host|
+          out[host.downcase] = v.downcase
+        end
+        out
+      end
     end
 
     # Captures everything in url except the host:
