@@ -14,7 +14,6 @@ class TestHostRedirect < Test::Unit::TestCase
   def app
     Rack::HostRedirect.new(INNER_APP, {
       'www.FOO.com' => 'www.bar.com',
-      'LOOP.foo.com' => 'Loop.foo.com', # test no redirects to same host
       %w(one.foo.com two.foo.com) => 'three.foo.com',
       'withopts.foo.com' => {:host => 'www.bar.com', :path => '/', :query => nil}
     })
@@ -48,9 +47,12 @@ class TestHostRedirect < Test::Unit::TestCase
     assert_equal 'http://www.bar.com/one?two=three', last_response['location']
   end
 
-  def test_does_not_redirect_to_current_host
-    get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'loop.foo.COM'
-    assert last_response.ok?
+  def test_config_circular_redirect_raises_argument_error
+    assert_raises ArgumentError do
+      Rack::HostRedirect.new(INNER_APP, {
+        'LOOP.foo.com' => 'Loop.foo.com'
+      })
+    end
   end
 
   def test_config_without_host_value_raises_argument_error

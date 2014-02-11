@@ -12,9 +12,7 @@ class Rack::HostRedirect
     request = Rack::Request.new(env)
     host = request.host.downcase # downcase for case-insensitive matching
 
-    updated_uri_opts = @host_mapping[host]
-
-    if updated_uri_opts && updated_uri_opts[:host] != host
+    if updated_uri_opts = @host_mapping[host]
       location = update_url(request.url, updated_uri_opts)
       [301, {'Location' => location}, []]
     else
@@ -35,7 +33,13 @@ class Rack::HostRedirect
         end
 
         [k].flatten.each do |oldhost|
-          out[oldhost.downcase] = opts
+          oldhost = oldhost.downcase
+
+          if oldhost == opts[:host]
+            raise ArgumentError, "Circular redirect to #{oldhost}"
+          else
+            out[oldhost] = opts
+          end
         end
 
         out
