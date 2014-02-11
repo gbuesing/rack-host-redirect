@@ -20,11 +20,7 @@ gem 'rack-host-redirect'
 in config/application.rb:
 
 ```ruby
-# Insert Rack::HostRedirect before middleware that serves static assets,
-# so that static assets in /public (e.g. robots.txt) won't be served under an obsolete host.
-# config.serve_static_assets must be set to true for ActionDispatch::Static to be present
-# (Heroku Cedar will force config.serve_static_assets to true.)
-config.middleware.insert_before ActionDispatch::Static, Rack::HostRedirect, {
+config.middleware.use Rack::HostRedirect, {
   'myapp.herokuapp.com' => 'www.myapp.com',
   'old.myapp.com'       => 'new.myapp.com'
 }
@@ -40,21 +36,36 @@ will be 301 redirected to:
 
     https://www.myapp.com/foo?bar=baz
 
-
-Rack configuration
-------------------
-
-Example config.ru:
+Multiple legacy hosts that redirect to the same new host can be specified as an array:
 
 ```ruby
+config.middleware.use Rack::HostRedirect, {
+  %w(myapp.herokuapp.com foo.myapp.com) => 'www.myapp.com'
+}
+```
+
+URI methods to set for redirect location can be specified as a hash:
+
+```ruby
+# Don't preserve path or query on redirect:
+config.middleware.use Rack::HostRedirect, {
+  'bar.myapp.com' => {host: 'www.myapp.com', path: '/', query: nil}
+}
+```
+
+When specifying a URI methods hash, the ```:host``` key is required; all other URI keys are optional.
+
+
+Rack configuration
+-------------------
+
+```ruby
+# config.ru
 require 'rubygems'
 require 'rack-host-redirect'
-require 'myapp'
 
-# Be sure to insert this before any middleware that serves static assets
 use Rack::HostRedirect, {
-  'myapp.herokuapp.com' => 'www.myapp.com',
-  'old.myapp.com'       => 'new.myapp.com'
+  'legacy.myapp.com' => 'www.myapp.com'
 }
 
 run MyApp
