@@ -13,7 +13,7 @@ class Rack::HostRedirect
 
     updated_host = @host_mapping[host]
 
-    if updated_host && updated_host.downcase != host
+    if updated_host && updated_host != host
       location = replace_host(request.url, updated_host)
       [301, {'Location' => location}, []]
     else
@@ -24,7 +24,7 @@ class Rack::HostRedirect
   private
 
     def downcase_keys hsh
-      hsh.inject({}) {|out, (k, v)| out[k.downcase] = v; out }
+      hsh.inject({}) {|out, (k, v)| out[k.downcase] = v.downcase; out }
     end
 
     # Captures everything in url except the host:
