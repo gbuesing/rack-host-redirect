@@ -15,7 +15,8 @@ class TestHostRedirect < Test::Unit::TestCase
     Rack::HostRedirect.new(INNER_APP, {
       'www.FOO.com' => 'www.bar.com',
       'LOOP.foo.com' => 'Loop.foo.com', # test no redirects to same host
-      %w(one.foo.com two.foo.com) => 'three.foo.com'
+      %w(one.foo.com two.foo.com) => 'three.foo.com',
+      'withopts.foo.com' => {:host => 'www.bar.com', :path => '/', :query => nil}
     })
   end
 
@@ -25,12 +26,17 @@ class TestHostRedirect < Test::Unit::TestCase
     assert_equal 'http://www.bar.com/one?two=three', last_response['location']
     follow_redirect!
     assert last_response.ok?
+
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'www.baz.com'
     assert last_response.ok?
 
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'one.foo.COM'
     assert_equal 301, last_response.status
     assert_equal 'http://three.foo.com/one?two=three', last_response['location']
+
+    get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'withopts.foo.com'
+    assert_equal 301, last_response.status
+    assert_equal 'http://www.bar.com/', last_response['location']
   end
 
   def test_prefers_x_forwarded_host_when_available

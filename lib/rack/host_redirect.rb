@@ -12,10 +12,10 @@ class Rack::HostRedirect
     request = Rack::Request.new(env)
     host = request.host.downcase # downcase for case-insensitive matching
 
-    updated_host = @host_mapping[host]
+    updated_uri_opts = @host_mapping[host]
 
-    if updated_host && updated_host != host
-      location = replace_host(request.url, updated_host)
+    if updated_uri_opts && updated_uri_opts[:host] != host
+      location = update_url(request.url, updated_uri_opts)
       [301, {'Location' => location}, []]
     else
       @app.call(env)
@@ -25,17 +25,29 @@ class Rack::HostRedirect
   private
 
     def preprocess_mapping hsh
-      hsh.inject({}) do |out, (k, v)| 
-        [k].flatten.each do |host|
-          out[host.downcase] = v.downcase
+      hsh.inject({}) do |out, (k, opts)| 
+        opts = {:host => opts} if opts.is_a?(String)
+        
+        if newhost = opts[:host]
+          opts[:host] = newhost.downcase
         end
+
+        [k].flatten.each do |oldhost|
+          out[oldhost.downcase] = opts
+        end
+
         out
       end
     end
 
-    def replace_host url, host
+    def update_url url, opts
       uri = URI(url)
-      uri.host = host
+
+      opts.each do |k, v| 
+        setter = :"#{k}="
+        uri.send(setter, v) if uri.respond_to?(setter)
+      end
+
       uri.to_s
     end
 end
