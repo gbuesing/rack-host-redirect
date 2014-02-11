@@ -2,17 +2,16 @@ require 'rack/request'
 
 class Rack::HostRedirect
 
-  def initialize(app, host_mapping = nil, &block)
+  def initialize(app, host_mapping)
     @app = app
-    @host_mapping = downcase_keys(host_mapping) if host_mapping
-    @block = block
+    @host_mapping = downcase_keys(host_mapping)
   end
 
   def call(env)
     request = Rack::Request.new(env)
     host = request.host.downcase # downcase for case-insensitive matching
 
-    updated_host = (@host_mapping && @host_mapping[host]) || (@block && @block.call(host, env))
+    updated_host = @host_mapping[host]
 
     if updated_host && updated_host.downcase != host
       location = replace_host(request.url, updated_host)
