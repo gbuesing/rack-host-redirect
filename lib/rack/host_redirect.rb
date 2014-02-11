@@ -50,8 +50,7 @@ class Rack::HostRedirect
       uri = URI(url)
 
       opts.each do |k, v| 
-        setter = :"#{k}="
-        uri.send(setter, v) if uri.respond_to?(setter)
+        uri.send(:"#{k}=", v)
       end
 
       uri.to_s
