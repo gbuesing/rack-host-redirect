@@ -46,18 +46,4 @@ class TestHostRedirect < Test::Unit::TestCase
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'loop.foo.COM'
     assert last_response.ok?
   end
-
-  def test_replace_host
-    assert_equal 'http://foo.com',                  replace('http://bar.com',                  'foo.com')
-    assert_equal 'https://foo.com/',                replace('https://bar.com/',                'foo.com')
-    assert_equal 'http://foo.com?a=b',              replace('http://bar.com?a=b',              'foo.com')
-    assert_equal 'http://foo.com/baz/qux?a=b',      replace('http://bar.com/baz/qux?a=b',      'foo.com')
-    assert_equal 'http://foo.com:3000/baz/qux?a=b', replace('http://bar.com:3000/baz/qux?a=b', 'foo.com')
-    assert_equal 'http://하였다.com/baz?a=b',        replace('http://위키백과.com/baz?a=b',       '하였다.com')
-  end
-
-private
-  def replace url, host
-    app.send(:replace_host, url, host)
-  end
 end

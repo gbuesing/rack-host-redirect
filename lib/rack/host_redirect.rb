@@ -1,4 +1,5 @@
 require 'rack/request'
+require 'uri'
 
 class Rack::HostRedirect
 
@@ -32,16 +33,9 @@ class Rack::HostRedirect
       end
     end
 
-    # Captures everything in url except the host:
-    #
-    #     REPLACE_HOST_REGEX =~ 'https://foo.com/bar?baz=qux'
-    #
-    #     $1 == 'https://'
-    #     $2 == '/bar?baz=qux'
-    REPLACE_HOST_REGEX = /(https?:\/\/)[^\/\?:]+(.*)/
-
     def replace_host url, host
-      REPLACE_HOST_REGEX =~ url
-      "#{$1}#{host}#{$2}"
+      uri = URI(url)
+      uri.host = host
+      uri.to_s
     end
 end
