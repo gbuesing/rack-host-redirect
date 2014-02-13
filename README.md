@@ -20,15 +20,12 @@ gem 'rack-host-redirect'
 in config/application.rb:
 
 ```ruby
-config.middleware.use Rack::HostRedirect, {
-  'myapp.herokuapp.com' => 'www.myapp.com',
-  'old.myapp.com'       => 'new.myapp.com'
-}
+config.middleware.use Rack::HostRedirect, 'myapp.herokuapp.com' => 'www.myapp.com'
 ```
 
 With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 redirected to ```www.myapp.com```, and all requests to ```old.myapp.com``` will be 301 redirected to ```new.myapp.com```.
 
-Path and querystring are preserved, so a request to:
+Path, querystring and protocol are preserved, so a request to:
 
     https://myapp.herokuapp.com/foo?bar=baz
 
@@ -36,7 +33,16 @@ will be 301 redirected to:
 
     https://www.myapp.com/foo?bar=baz
 
-Multiple legacy hosts that redirect to the same new host can be specified as an array:
+Addtional host redirections can be specified as key-value pairs in the host mapping hash:
+
+```ruby
+config.middleware.use Rack::HostRedirect, {
+  'myapp.herokuapp.com' => 'www.myapp.com',
+  'old.myapp.com'       => 'new.myapp.com'
+}
+```
+
+Multiple hosts that map to the same redirect destination host can be specified by an Array key:
 
 ```ruby
 config.middleware.use Rack::HostRedirect, {
@@ -44,7 +50,7 @@ config.middleware.use Rack::HostRedirect, {
 }
 ```
 
-URI methods to set for redirect location can be specified as a hash:
+URI methods to set for redirect location can be specified as a hash value:
 
 ```ruby
 # Don't preserve path or query on redirect:
@@ -64,9 +70,7 @@ Rack configuration
 require 'rubygems'
 require 'rack-host-redirect'
 
-use Rack::HostRedirect, {
-  'legacy.myapp.com' => 'www.myapp.com'
-}
+use Rack::HostRedirect, 'myapp.herokuapp.com' => 'www.myapp.com'
 
 run MyApp
 ```
