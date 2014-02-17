@@ -23,7 +23,7 @@ in config/application.rb:
 config.middleware.use Rack::HostRedirect, 'myapp.herokuapp.com' => 'www.myapp.com'
 ```
 
-With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 redirected to ```www.myapp.com```, and all requests to ```old.myapp.com``` will be 301 redirected to ```new.myapp.com```.
+With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 redirected to ```www.myapp.com```.
 
 Path, querystring and protocol are preserved, so a request to:
 
