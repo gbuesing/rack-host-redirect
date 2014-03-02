@@ -38,6 +38,13 @@ class TestHostRedirect < Test::Unit::TestCase
     assert_equal 'http://www.bar.com/', last_response['location']
   end
 
+  def test_includes_content_type_and_content_length_headers
+    get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'www.foo.COM'
+    assert_equal 301, last_response.status
+    assert_equal 'text/html', last_response['Content-Type']
+    assert_equal '0', last_response['Content-Length']
+  end
+
   def test_prefers_x_forwarded_host_when_available
     env = {'HTTP_HOST' => 'localhost', 'SERVER_NAME' => 'localhost', 'SERVER_PORT' => '3000'}
     get '/one', {'two' => 'three'}, env

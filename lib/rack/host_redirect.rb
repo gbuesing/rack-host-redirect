@@ -14,7 +14,7 @@ class Rack::HostRedirect
 
     if updated_uri_opts = @host_mapping[host]
       location = update_url(request.url, updated_uri_opts)
-      [301, {'Location' => location}, []]
+      [301, {'Location' => location, 'Content-Type' => 'text/html', 'Content-Length' => '0'}, []]
     else
       @app.call(env)
     end
