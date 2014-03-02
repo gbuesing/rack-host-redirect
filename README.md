@@ -72,9 +72,8 @@ require 'test_helper'
 
 class HostTest < ActionDispatch::IntegrationTest
   test "myapp.herokuapp.com is redirected to www.myapp.com" do
-    host! "myapp.herokuapp.com"
-    get '/'
-    assert_redirected_to 'http://www.myapp.com/'
+    get 'https://myapp.herokuapp.com/'
+    assert_redirected_to 'https://www.myapp.com/'
     follow_redirect!
     assert_response :success
   end
