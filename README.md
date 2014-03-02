@@ -5,7 +5,9 @@ A lean and simple Rack middleware that 301 redirects requests from one host to a
 
 This is useful for environments where it's difficult or impossible to implement this via Nginx/Apache configuration (e.g. Heroku.)
 
-I'm using this to redirect traffic from a *.herokuapp.com subdomain to a custom domain.
+I'm using this to redirect traffic from a *.herokuapp.com subdomain to a custom domain, and to redirect the www subdomain to the bare domain.
+
+Configuration below is for Rails, but this middleware should also work just fine with Sinatra and bare Rack apps.
 
 
 Rails configuration
@@ -62,15 +64,19 @@ config.middleware.use Rack::HostRedirect, {
 When specifying a URI methods hash, the ```:host``` key is required; all other URI keys are optional.
 
 
-Rack configuration
--------------------
+Testing with Rails Integration Test
+-----------------------------------
 
 ```ruby
-# config.ru
-require 'rubygems'
-require 'rack-host-redirect'
+require 'test_helper'
 
-use Rack::HostRedirect, 'myapp.herokuapp.com' => 'www.myapp.com'
-
-run MyApp
+class HostTest < ActionDispatch::IntegrationTest
+  test "myapp.herokuapp.com is redirected to www.myapp.com" do
+    host! "myapp.herokuapp.com"
+    get '/'
+    assert_redirected_to 'http://www.myapp.com/'
+    follow_redirect!
+    assert_response :success
+  end
+end
 ```
