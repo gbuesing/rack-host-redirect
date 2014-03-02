@@ -36,7 +36,7 @@ class Rack::HostRedirect
           oldhost = oldhost.downcase
 
           if oldhost == opts[:host]
-            raise ArgumentError, "Circular redirect to #{oldhost}"
+            raise ArgumentError, "#{oldhost.inspect} is being redirected to itself"
           else
             out[oldhost] = opts
           end
