@@ -19,10 +19,12 @@ in Gemfile:
 gem 'rack-host-redirect'
 ```
 
-in config/application.rb:
+in config/environments/production.rb:
 
 ```ruby
-config.middleware.use Rack::HostRedirect, 'myapp.herokuapp.com' => 'www.myapp.com'
+config.middleware.use Rack::HostRedirect, {
+  'myapp.herokuapp.com' => 'www.myapp.com'
+}
 ```
 
 With this configuration, all requests to ```myapp.herokuapp.com``` will be 301 redirected to ```www.myapp.com```.
@@ -64,18 +66,13 @@ config.middleware.use Rack::HostRedirect, {
 When specifying a URI methods hash, the ```:host``` key is required; all other URI keys are optional.
 
 
-Testing with Rails Integration Test
------------------------------------
+With ActionDispatch::SSL
+------------------------
+
+If your app is using ```config.force_ssl = true```, you'll likely want to insert ```Rack::HostRedirect``` ahead of ```ActionDispatch::SSL``` in the middleware stack, thus avoiding any issues with certs for legacy domains:
 
 ```ruby
-require 'test_helper'
-
-class HostTest < ActionDispatch::IntegrationTest
-  test "myapp.herokuapp.com is redirected to www.myapp.com" do
-    get 'https://myapp.herokuapp.com/'
-    assert_redirected_to 'https://www.myapp.com/'
-    follow_redirect!
-    assert_response :success
-  end
-end
+config.middleware.insert_before ActionDispatch::SSL, Rack::HostRedirect, {
+  'www.legacy-domain.com' => 'www.myapp.com'
+}
 ```
