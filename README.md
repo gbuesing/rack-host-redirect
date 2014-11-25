@@ -69,7 +69,7 @@ When specifying a URI methods hash, the ```:host``` key is required; all other U
 With ActionDispatch::SSL
 ------------------------
 
-If your app is using ```config.force_ssl = true```, you'll likely want to insert ```Rack::HostRedirect``` ahead of ```ActionDispatch::SSL``` in the middleware stack, thus avoiding any issues with certs for legacy domains:
+If your app is setting ```config.force_ssl = true``` and you're redirecting from a domain for which you don't maintain certs, you should insert ```Rack::HostRedirect``` ahead of ```ActionDispatch::SSL``` in the middleware stack, so that the redirect happens before the SSL upgrade:
 
 ```ruby
 config.middleware.insert_before ActionDispatch::SSL, Rack::HostRedirect, {
