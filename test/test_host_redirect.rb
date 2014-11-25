@@ -1,6 +1,6 @@
 # encoding: UTF-8
 require 'rubygems'
-require 'test/unit'
+require 'minitest/autorun'
 require "rack/test"
 require 'rack-host-redirect'
 
@@ -8,7 +8,7 @@ require 'rack-host-redirect'
 INNER_APP = Proc.new { [200, {}, ['OK']] }
 
 
-class TestHostRedirect < Test::Unit::TestCase
+class TestHostRedirect < MiniTest::Test
   include Rack::Test::Methods
 
   def app
