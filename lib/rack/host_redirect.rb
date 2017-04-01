@@ -10,9 +10,8 @@ class Rack::HostRedirect
 
   def call(env)
     request = Rack::Request.new(env)
-    host = request.host.downcase # downcase for case-insensitive matching
-
-    if updated_uri_opts = @host_mapping[host]
+    
+    if updated_uri_opts = get_updated_uri_opts(request)
       location = update_url(request.url, updated_uri_opts)
       [301, {'Location' => location, 'Content-Type' => 'text/html', 'Content-Length' => '0'}, []]
     else
@@ -32,18 +31,27 @@ class Rack::HostRedirect
           raise ArgumentError, ":host key must be specified in #{opts.inspect}"
         end
 
+        exclude_proc = opts.delete(:exclude)
+
         [k].flatten.each do |oldhost|
           oldhost = oldhost.downcase
 
           if oldhost == opts[:host]
             raise ArgumentError, "#{oldhost.inspect} is being redirected to itself"
           else
-            out[oldhost] = opts
+            out[oldhost] = [opts, exclude_proc]
           end
         end
 
         out
       end
+    end
+
+    def get_updated_uri_opts request
+      host = request.host.downcase # downcase for case-insensitive matching
+      uri_opts, exclude_proc = @host_mapping[host]
+      return if exclude_proc && exclude_proc.call(request)
+      uri_opts
     end
 
     def update_url url, opts

@@ -13,9 +13,10 @@ class TestHostRedirect < MiniTest::Test
 
   def app
     Rack::HostRedirect.new(INNER_APP, {
-      'www.FOO.com' => 'www.bar.com',
+      'www.FOO.com'               => 'www.bar.com',
       %w(one.foo.com two.foo.com) => 'three.foo.com',
-      'withopts.foo.com' => {:host => 'www.bar.com', :path => '/', :query => nil}
+      'withopts.foo.com'          => {host: 'www.bar.com', path: '/', query: nil},
+      'withexclude.foo.com'       => {host: 'www.bar.com', exclude: -> (request) {request.path.start_with?('/exclude/')}}
     })
   end
 
@@ -36,6 +37,13 @@ class TestHostRedirect < MiniTest::Test
     get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'withopts.foo.com'
     assert_equal 301, last_response.status
     assert_equal 'http://www.bar.com/', last_response['location']
+
+    get '/one', {'two' => 'three'}, 'HTTP_HOST' => 'withexclude.foo.com'
+    assert_equal 301, last_response.status
+    assert_equal 'http://www.bar.com/one?two=three', last_response['location']
+
+    get '/exclude/one', {'two' => 'three'}, 'HTTP_HOST' => 'withexclude.foo.com'
+    assert last_response.ok?
   end
 
   def test_includes_content_type_and_content_length_headers
