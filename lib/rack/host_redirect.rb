@@ -50,8 +50,7 @@ class Rack::HostRedirect
     def get_updated_uri_opts request
       host = request.host.downcase # downcase for case-insensitive matching
       uri_opts, exclude_proc = @host_mapping[host]
-      return if exclude_proc && exclude_proc.call(request)
-      uri_opts
+      uri_opts unless exclude_proc && exclude_proc.call(request)
     end
 
     def update_url url, opts
