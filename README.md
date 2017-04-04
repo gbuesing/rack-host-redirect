@@ -66,6 +66,24 @@ config.middleware.use Rack::HostRedirect, {
 When specifying a URI methods hash, the ```:host``` key is required; all other URI keys are optional.
 
 
+Skip redirect for special cases (e.g. Let's Encrypt)
+---
+
+When you specify a host redirect, it will redirect all requests to that host, but if you need certain exclusions to this -- e.g. you're handling a Let's Encrypt challenge request in your app, so you need to let that pass through -- you can do so via passing in a Proc to the ```:exclude``` key:
+
+```ruby
+# Allow ACME challenge request to pass through, redirect everything else:
+config.middleware.use Rack::HostRedirect, {
+  'www.example.com' => {
+    host: 'example.com', 
+    exclude: -> (request) { request.path.start_with?('/.well-known/acme-challenge/') }
+  }
+}
+```
+
+The proc will be called for each request with the ```Rack::Request``` object. If the proc returns a truthy value, the request will pass through without a redirect.
+
+
 With ActionDispatch::SSL
 ------------------------
 
