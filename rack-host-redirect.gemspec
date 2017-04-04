@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'rack-host-redirect'
-  s.version = '1.2.1'
-  s.date    = '2014-02-11'
+  s.version = '1.3.0'
+  s.date    = '2017-04-04'
   s.author  = 'Geoff Buesing'
   s.email   = 'gbuesing@gmail.com'
   s.summary = 'Lean and simple host redirection via Rack middleware'
