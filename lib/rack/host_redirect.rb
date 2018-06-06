@@ -34,7 +34,10 @@ class Rack::HostRedirect
         exclude_proc = opts.delete(:exclude)
 
         [k].flatten.each do |oldhost|
-          oldhost = oldhost.downcase
+        oldhost = case oldhost
+                    when String then oldhost.downcase
+                    when Regexp then Regexp.new oldhost.source, Regexp::IGNORECASE
+                  end
 
           if oldhost == opts[:host]
             raise ArgumentError, "#{oldhost.inspect} is being redirected to itself"
@@ -49,8 +52,11 @@ class Rack::HostRedirect
 
     def get_updated_uri_opts request
       host = request.host.downcase # downcase for case-insensitive matching
-      uri_opts, exclude_proc = @host_mapping[host]
-      uri_opts unless exclude_proc && exclude_proc.call(request)
+      _, opts = @host_mapping.find { |h, _| h.match host }
+      if opts
+        uri_opts, exclude_proc = opts
+        uri_opts unless exclude_proc && exclude_proc.call(request)
+      end
     end
 
     def update_url url, opts

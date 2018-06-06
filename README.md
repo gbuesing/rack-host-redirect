@@ -54,6 +54,14 @@ config.middleware.use Rack::HostRedirect, {
 }
 ```
 
+Hosts can also be matched via regular expressions:
+
+```ruby
+config.middleware.use Rack::HostRedirect, {
+  %r(\w+.yourapp.com) => 'www.myapp.com'
+}
+```
+
 URI methods to set for redirect location can be specified as a hash value:
 
 ```ruby
