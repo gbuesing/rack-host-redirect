@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rack'
   s.add_development_dependency 'rack-test'
+  s.add_development_dependency 'minitest'
 
   s.files = ['lib/rack-host-redirect.rb', 'lib/rack/host_redirect.rb']
 end
